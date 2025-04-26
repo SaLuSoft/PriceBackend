@@ -9,9 +9,9 @@ login = os.environ.get('MONGO_USERNAME', 'root')
 password = os.environ.get('MONGO_PASSWORD', 'root')
 
 if login != '':
-    mongo_uri = 'mongodb://%s:%s@%s:%d/' % (login, password, host, port)
+    mongo_uri = f'mongodb://{login}:{password}@{host}:{port}/'
 else:
-    mongo_uri = 'mongodb://%s:%d/' % (host, port)
+    mongo_uri = f'mongodb://{host}:{port}/'
 
 
 class DB_Barcode:
