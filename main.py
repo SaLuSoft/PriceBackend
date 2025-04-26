@@ -14,19 +14,15 @@ async def CheckBarcodes(request: Request):
             'code': request.headers['code'],
             'version': request.headers['vers'],
             'uid': request.headers['uid'],
-            'data': (await request.body()).decode('utf8')
+            'data': await request.json()
         }
-    except Exception:
+
+        db = DB_Barcode.DB_Barcode(UserData)
+        return db.checkBarcodes()
+
+    except Exception as e:
+        print(e)
         raise HTTPException(status_code=400)
-
-    DB_Barcode.saveRequest(**UserData)
-
-    if not DB_Barcode.checkUser(UserData['uid']):
-        raise HTTPException(status_code=404, detail='Հաճախորդը գրացված չէ')
-
-    BarcodeData = DB_Barcode.checkBarcodes(UserData['data'])
-
-    return BarcodeData
 
 
 @app.post("/Price/hs/BC/GD")
@@ -39,20 +35,13 @@ async def getBarcodeData(request: Request):
             'uid': request.headers['uid'],
             'data': (await request.body()).decode('utf8')
         }
-    except Exception:
-        raise HTTPException(status_code=400)
 
-    DB_Barcode.saveRequest(**UserData)
+        db = DB_Barcode.DB_Barcode(UserData)
+        return db.getBarcodeData()
 
-    if not DB_Barcode.checkUser(UserData['uid']):
-        raise HTTPException(status_code=404, detail='Հաճախորդը գրացված չէ')
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
-    try:
-        BarcodeData = DB_Barcode.getBarcodeData(UserData['data'])
-    except Exception:
-        raise HTTPException(status_code=404)
-
-    return BarcodeData
 
 
 @app.post('/Price/admin')
@@ -84,5 +73,5 @@ async def admin(request: Request):
 
 
 if __name__ == "__main__":
-    MYPORT = int(os.environ.get('MYPORT', 8000))
-    uvicorn.run(app, host="0.0.0.0", port=MYPORT)
+    port = int(os.environ.get('PY_PORT', 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
