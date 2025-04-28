@@ -46,7 +46,7 @@ class DB_Barcode:
 
         user = collection.find_one({"_id": self.uid})
         if user == None or user["available_date"] < datetime.now():
-            raise 'Հաճախորդը գրացված չէ'
+            raise Exception('Հաճախորդը գրացված չէ')
 
     def getBarcodeData(self):
         print(f'getBarcodeData(barcode:{self.data})')
