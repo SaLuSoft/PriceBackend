@@ -1,6 +1,7 @@
 version: '3.8'
 services:
   backend:
+    container_name: backend_py
     build: .
     ports:
       - ${PY_PORT}:${PY_PORT}
@@ -15,8 +16,8 @@ services:
     container_name: ${MONGO_HOST}
     image: mongo
     environment:
-      - MONGO_INITDB_ROOT_USERNAME:${MONGO_USERNAME}
-      - MONGO_INITDB_ROOT_PASSWORD:${MONGO_PASSWORD}
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
     ports:
       - ${MONGO_PORT}:${MONGO_PORT}
     volumes:

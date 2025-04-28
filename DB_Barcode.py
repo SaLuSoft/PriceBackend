@@ -5,8 +5,8 @@ import os
 
 host = os.environ.get('MONGO_HOST', 'localhost')
 port = int(os.environ.get('MONGO_PORT', 27017))
-login = os.environ.get('MONGO_USERNAME', 'root')
-password = os.environ.get('MONGO_PASSWORD', 'root')
+login = os.environ.get('MONGO_INITDB_ROOT_USERNAME', 'root')
+password = os.environ.get('MONGO_INITDB_ROOT_PASSWORD', 'root')
 
 if login != '':
     mongo_uri = f'mongodb://{login}:{password}@{host}:{port}/'
