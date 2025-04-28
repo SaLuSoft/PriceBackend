@@ -1,26 +1,16 @@
 from pymongo import MongoClient
 from datetime import datetime
-import os
-
-
-host = os.environ.get('MONGO_HOST', 'localhost')
-port = int(os.environ.get('MONGO_PORT', 27017))
-login = os.environ.get('MONGO_INITDB_ROOT_USERNAME', 'root')
-password = os.environ.get('MONGO_INITDB_ROOT_PASSWORD', 'root')
-
-if login != '':
-    mongo_uri = f'mongodb://{login}:{password}@{host}:{port}/'
-else:
-    mongo_uri = f'mongodb://{host}:{port}/'
 
 
 class DB_Barcode:
-    def __init__(self, req_data):
+    def __init__(self, env, req_data):
         self.ip = req_data['ip']
         self.code = req_data['code']
         self.version = req_data['version']
         self.uid = req_data['uid']
         self.data = req_data['data']
+
+        mongo_uri = f'mongodb://{env["MONGO_USERNAME"]}:{env["MONGO_PASSWORD"]}@{env["MONGO_HOST"]}:{env["MONGO_PORT"]}/'
 
         client = MongoClient(mongo_uri)
         self.db = client["Barcodes"]
@@ -62,17 +52,18 @@ class DB_Barcode:
                 "is_tin": data["is_tin"]
             }
         else:
-            raise Exception("I love Python!")
+            raise Exception("Շտրիխկոդը չի գտնվել")
 
     def checkBarcodes(self):
         print(f'checkBarcodes(barcodes:{self.data})')
         collection = self.db["BarcodesData"]
 
-        list = collection.find({"_id": {"$in": self.data}})
+        list_barcodes = self.data.split('|')
+        list = collection.find({"_id": {"$in": list_barcodes}})
         Res = []
         for barcode in list:
             Res.append(barcode["_id"])
-        return Res
+        return '|'.join(Res)
 
 
 if __name__ == '__main__':

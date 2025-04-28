@@ -1,8 +1,17 @@
 from fastapi import FastAPI, Request, HTTPException
 import uvicorn
 import os
-from datetime import datetime
 import DB_Barcode
+
+
+env = {
+    'PY_PORT': int(os.environ.get('PY_PORT')),
+    'MONGO_HOST': os.environ.get('MONGO_HOST'),
+    'MONGO_PORT': int(os.environ.get('MONGO_PORT')),
+    'MONGO_USERNAME': os.environ.get('MONGO_INITDB_ROOT_USERNAME'),
+    'MONGO_PASSWORD': os.environ.get('MONGO_INITDB_ROOT_PASSWORD')
+}
+print('env', env)
 
 app = FastAPI()
 
@@ -14,10 +23,10 @@ async def CheckBarcodes(request: Request):
             'code': request.headers['code'],
             'version': request.headers['vers'],
             'uid': request.headers['uid'],
-            'data': await request.json()
+            'data': (await request.body()).decode('utf8')
         }
 
-        db = DB_Barcode.DB_Barcode(UserData)
+        db = DB_Barcode.DB_Barcode(env, UserData)
         return db.checkBarcodes()
 
     except Exception as e:
@@ -36,7 +45,7 @@ async def getBarcodeData(request: Request):
             'data': (await request.body()).decode('utf8')
         }
 
-        db = DB_Barcode.DB_Barcode(UserData)
+        db = DB_Barcode.DB_Barcode(env, UserData)
         return db.getBarcodeData()
 
     except Exception as e:
@@ -44,5 +53,4 @@ async def getBarcodeData(request: Request):
 
 
 if __name__ == "__main__":
-    port = int(os.environ.get('PY_PORT', 8000))
-    uvicorn.run(app, host="0.0.0.0", port=port)
+    uvicorn.run(app, host="0.0.0.0", port=env['PY_PORT'])
