@@ -43,35 +43,6 @@ async def getBarcodeData(request: Request):
         raise HTTPException(status_code=400, detail=str(e))
 
 
-
-@app.post('/Price/admin')
-async def admin(request: Request):
-    try:
-        UserData = {
-            'ip': request.client.host,
-            'code': request.headers['code'],
-            'version': request.headers['vers'],
-            'uid': request.headers['uid'],
-            'data': await request.json()
-        }
-
-        DB_Barcode.saveRequest(**UserData)
-        if UserData['data']['action'] == 'addUser':
-            available_date = datetime.strptime(UserData['data']['available_date'], "%d%m%Y")
-            DB_Barcode.addUser(UserData['data']['uid'], available_date)
-        elif UserData['data']['action'] == 'setBarcodeData':
-            for barcode in UserData['data']['barcodes']:
-                DB_Barcode.setBarcodeData(**barcode)
-        else:
-            raise HTTPException(status_code=404)
-
-
-        return "Ok"
-    except Exception as e:
-        print(e)
-        raise HTTPException(status_code=400)
-
-
 if __name__ == "__main__":
     port = int(os.environ.get('PY_PORT', 8000))
     uvicorn.run(app, host="0.0.0.0", port=port)
